@@ -1,0 +1,203 @@
+@{
+    ViewData["Title"] = "Acoustic Intelligence Engine";
+}
+
+<div class="main-container glass-premium">
+    <header>
+        <h1>Audio Sense Pro</h1>
+        <p>Advanced Spectrum Classification</p>
+    </header>
+
+    <!-- 📊 Separate Metric Cards -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="m-label">Samples</div>
+            <div id="stat-samples" class="m-value">--</div>
+        </div>
+        <div class="metric-card">
+            <div class="m-label">Precision</div>
+            <div id="stat-precision" class="m-value">--</div>
+        </div>
+        <div class="metric-card">
+            <div class="m-label">Recall</div>
+            <div id="stat-recall" class="m-value">--</div>
+        </div>
+    </div>
+
+    <div class="actions-grid">
+        <div class="action-card" onclick="runOp('ingest', this)">
+            <div class="icon-wrap">
+                <i class="fas fa-file-import"></i>
+            </div>
+            <b>Ingest Data</b>
+            <span>Extract Features</span>
+        </div>
+        <div class="action-card" onclick="runOp('train', this)">
+            <div class="icon-wrap">
+                <i class="fas fa-microchip"></i>
+            </div>
+            <b>Train Engine</b>
+            <span>Model Optimization</span>
+        </div>
+    </div>
+
+    <div class="drop-zone" id="dropArea" onclick="document.getElementById('audioIn').click()">
+        <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--accent); opacity: 0.6; margin-bottom: 1rem;"></i>
+        <div id="fileName" style="font-weight: 700; font-size: 1.1rem;">Select Audio Sample</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">WAV / MP3 Engine Optimized</div>
+        <input type="file" id="audioIn" hidden accept=".mp3,.wav" onchange="fileChosen()">
+    </div>
+
+    <button class="btn-main" id="predBtn" onclick="predict()">
+        <span>Execute Analysis</span>
+        <i class="fas fa-bolt"></i>
+    </button>
+
+    <div id="result-box">
+        <div class="res-head">Detected Acoustic Class</div>
+        <div class="res-label" id="resLabel">--</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 700; margin-top: 1.2rem;">
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Engine Confidence</span>
+            <span id="resConf" style="color: var(--accent);">0%</span>
+        </div>
+        <div class="bar-bg">
+            <div class="bar-fill" id="resBar"></div>
+        </div>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<style>
+    .main-container {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 3.5rem;
+        border-radius: 32px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+    }
+
+    header { text-align: center; margin-bottom: 3rem; }
+    header h1 { font-size: 2.2rem; font-weight: 800; margin: 0; background: linear-gradient(135deg, var(--accent), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    header p { color: var(--text-muted); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 10px; }
+
+    .metrics-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.2rem; margin-bottom: 2.5rem; }
+    .metric-card { background: var(--glass); border: 1px solid var(--border); padding: 1.5rem; border-radius: 20px; text-align: center; }
+    .m-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+    .m-value { font-size: 1.4rem; font-weight: 800; color: var(--accent); }
+
+    .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 2rem; }
+    .action-card { background: var(--glass); border: 1px solid var(--border); padding: 1.8rem; border-radius: 24px; cursor: pointer; transition: all 0.3s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .action-card:hover { border-color: var(--accent); background: rgba(99, 102, 241, 0.1); transform: translateY(-5px); }
+    .icon-wrap { width: 44px; height: 44px; background: rgba(99, 102, 241, 0.1); color: var(--accent); border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+
+    .drop-zone { background: rgba(0, 0, 0, 0.2); border: 2px dashed var(--border); border-radius: 24px; padding: 3rem; text-align: center; margin-bottom: 2rem; cursor: pointer; transition: all 0.3s; }
+    .drop-zone.active { border-color: var(--accent); background: rgba(99, 102, 241, 0.05); }
+
+    .btn-main { background: linear-gradient(135deg, var(--accent), var(--accent-secondary)); color: white; border: none; width: 100%; padding: 1.2rem; border-radius: 18px; font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.3s; text-transform: uppercase; }
+    .btn-main:hover { transform: scale(1.01); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4); }
+
+    #result-box { margin-top: 2.5rem; padding: 2.5rem; background: var(--glass); border-radius: 24px; border: 1px solid var(--border); display: none; text-align: center; }
+    .res-head { font-size: 0.7rem; font-weight: 700; color: var(--accent); text-transform: uppercase; }
+    .res-label { font-size: 2.5rem; font-weight: 800; margin: 0.5rem 0; }
+    .bar-bg { height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; margin-top: 1.5rem; overflow: hidden; }
+    .bar-fill { height: 100%; background: var(--accent); width: 0%; transition: width 1s; }
+
+    #toast { position: fixed; bottom: 20px; right: 20px; background: var(--accent); color: white; padding: 14px 28px; border-radius: 14px; font-weight: 600; display: none; z-index: 1000; }
+    .spin { animation: spin 1s linear infinite; }
+    @@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+</style>
+
+<script>
+    window.onload = () => {
+        checkAuthOnPage();
+        fetchStats();
+    };
+
+    function getAuthHeader() {
+        const token = localStorage.getItem('token');
+        return token ? { 'Authorization': `Bearer ${token}` } : {};
+    }
+
+    function checkAuthOnPage() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/Account/Login';
+        }
+    }
+
+    async function fetchStats() {
+        try {
+            const res = await fetch('/api/audio/stats', { headers: getAuthHeader() });
+            if (res.status === 401) { logout(); return; }
+            const data = await res.json();
+            document.getElementById('stat-samples').innerText = data.totalSamples;
+            document.getElementById('stat-precision').innerText = (data.precision * 100).toFixed(1) + "%";
+            document.getElementById('stat-recall').innerText = (data.recall * 100).toFixed(1) + "%";
+        } catch(e) {}
+    }
+
+    function toast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg;
+        t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 3000);
+    }
+
+    function fileChosen() {
+        const input = document.getElementById('audioIn');
+        const area = document.getElementById('dropArea');
+        const name = document.getElementById('fileName');
+        if (input.files.length > 0) {
+            name.innerText = input.files[0].name;
+            area.classList.add('active');
+        }
+    }
+
+    async function runOp(endpoint, btn) {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<div class="icon-wrap"><svg class="spin" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg></div>';
+        try {
+            const res = await fetch(`/api/audio/${endpoint}`, { 
+                method: 'POST',
+                headers: getAuthHeader()
+            });
+            if (res.status === 401) { logout(); return; }
+            const data = await res.json();
+            toast(data.message || "Done");
+            await fetchStats();
+        } catch(e) { toast("Error"); }
+        finally { btn.innerHTML = orig; }
+    }
+
+    async function predict() {
+        const input = document.getElementById('audioIn');
+        if (input.files.length === 0) { toast("No file selected"); return; }
+        const btn = document.getElementById('predBtn');
+        const view = document.getElementById('result-box');
+        btn.disabled = true; btn.innerText = "Analyzing Spectrum...";
+        
+        const fd = new FormData(); 
+        fd.append('file', input.files[0]);
+        
+        try {
+            const res = await fetch('/api/audio/predict', { 
+                method: 'POST', 
+                body: fd,
+                headers: getAuthHeader()
+            });
+            if (res.status === 401) { logout(); return; }
+            const data = await res.json();
+            if (data.error) toast(data.error);
+            else {
+                document.getElementById('resLabel').innerText = data.prediction;
+                const c = (data.confidence * 100).toFixed(1);
+                document.getElementById('resConf').innerText = c + "%";
+                document.getElementById('resBar').style.width = c + "%";
+                view.style.display = 'block';
+            }
+        } catch(e) { toast("Failed to analyze"); }
+        finally { btn.disabled = false; btn.innerText = "Execute Analysis"; }
+    }
+</script>

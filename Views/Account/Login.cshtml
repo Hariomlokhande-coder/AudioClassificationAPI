@@ -1,0 +1,312 @@
+@{
+    ViewData["Title"] = "Log In";
+    ViewData["HideNav"] = true;
+}
+
+<div class="auth-wrapper">
+    <div class="auth-card glass-premium">
+        <div class="auth-header">
+            <div class="icon-circle">
+                <i class="fas fa-lock-open"></i>
+            </div>
+            <h2>Welcome Back</h2>
+            <p>Access your Audio Sense Engine</p>
+        </div>
+        
+        <form id="loginForm" class="auth-form">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <div class="input-container">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required />
+                    <div class="input-focus-bg"></div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-container">
+                    <i class="fas fa-key"></i>
+                    <input type="password" id="password" name="password" placeholder="Your secret password" required />
+                    <div class="input-focus-bg"></div>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-submit">
+                <span>Sign In</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            
+            <div class="auth-divider">
+                <span>OR</span>
+            </div>
+            
+            <div class="auth-footer">
+                <p>New to Audio Sense? <a href="/Account/Signup">Create an account</a></p>
+            </div>
+        </form>
+        
+        <div id="message" class="alert-premium"></div>
+    </div>
+</div>
+
+<style>
+    .auth-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 120px);
+        padding: 2rem;
+    }
+
+    .glass-premium {
+        background: rgba(30, 41, 59, 0.4); /* More transparent */
+        backdrop-filter: blur(12px) saturate(150%); /* Reduced blur */
+        -webkit-backdrop-filter: blur(12px) saturate(150%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 24px; /* Slightly smaller radius */
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        max-width: 440px; /* Slightly narrower */
+        padding: 2.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .glass-premium::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; height: 4px;
+        background: linear-gradient(90deg, #6366f1, #a855f7, #6366f1);
+        background-size: 200% auto;
+        animation: shine 3s linear infinite;
+    }
+
+    @@keyframes shine {
+        to { background-position: 200% center; }
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .icon-circle {
+        width: 70px;
+        height: 70px;
+        background: rgba(99, 102, 241, 0.1);
+        border: 2px solid rgba(99, 102, 241, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: #6366f1;
+        font-size: 1.8rem;
+    }
+
+    .auth-header h2 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .auth-header p {
+        color: #94a3b8;
+        font-size: 0.95rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #cbd5e1;
+        margin-bottom: 0.6rem;
+        margin-left: 0.5rem;
+    }
+
+    .input-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-container i {
+        position: absolute;
+        left: 1.25rem;
+        color: #64748b;
+        font-size: 1rem;
+        transition: color 0.3s ease;
+        z-index: 2;
+    }
+
+    .input-container input {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3.5rem;
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        color: white;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+
+    .input-container input:focus {
+        outline: none;
+        border-color: rgba(99, 102, 241, 0.5);
+        background: rgba(15, 23, 42, 0.8);
+    }
+
+    .input-container input:focus + .input-focus-bg {
+        opacity: 1;
+    }
+
+    .input-container input:focus ~ i {
+        color: #6366f1;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 1.1rem;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #6366f1, #a855f7);
+        color: white;
+        font-weight: 700;
+        font-size: 1.05rem;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-top: 2rem;
+        box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.5);
+        filter: brightness(1.1);
+    }
+
+    .btn-submit:active {
+        transform: translateY(1px);
+    }
+
+    .auth-divider {
+        margin: 2rem 0;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: #475569;
+    }
+
+    .auth-divider::before, .auth-divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .auth-divider span {
+        padding: 0 15px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+    }
+
+    .auth-footer {
+        text-align: center;
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+
+    .auth-footer a {
+        color: #6366f1;
+        text-decoration: none;
+        font-weight: 700;
+        margin-left: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .auth-footer a:hover {
+        color: #a855f7;
+        text-decoration: underline;
+    }
+
+    .alert-premium {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        border-radius: 12px;
+        display: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-align: center;
+        animation: slideIn 0.4s ease-out;
+    }
+
+    @@keyframes slideIn {
+        from { transform: translateY(10px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .alert-success { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+    .alert-error { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+</style>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const msg = document.getElementById('message');
+        const btn = e.target.querySelector('button');
+        const origBtnText = btn.innerHTML;
+        
+        msg.style.display = 'none';
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
+        
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+        
+        try {
+            const response = await fetch('/api/Auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                localStorage.setItem('token', result.token);
+                localStorage.setItem('username', result.username);
+                
+                msg.className = 'alert-premium alert-success';
+                msg.innerHTML = '<i class="fas fa-check-circle"></i> Login successful! Welcome back.';
+                msg.style.display = 'block';
+                setTimeout(() => window.location.href = '/', 1200);
+            } else {
+                msg.className = 'alert-premium alert-error';
+                msg.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${result.message || 'Authentication failed.'}`;
+                msg.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = origBtnText;
+            }
+        } catch (error) {
+            msg.className = 'alert-premium alert-error';
+            msg.innerHTML = '<i class="fas fa-wifi"></i> Connection error. Please try again.';
+            msg.style.display = 'block';
+            btn.disabled = false;
+            btn.innerHTML = origBtnText;
+        }
+    });
+</script>

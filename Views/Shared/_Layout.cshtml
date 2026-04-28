@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Audio Sense</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-main: #1e293b;
+            --glass: rgba(255, 255, 255, 0.05);
+            --accent: #6366f1;
+            --accent-secondary: #a855f7;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(-45deg, #0f172a, #1e293b, #111827);
+            background-size: 400% 400%;
+            animation: gradient 20s ease infinite; /* Slower, more subtle */
+            color: var(--text);
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        @@keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        #auth-links, #user-info {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:not(.btn-auth):hover,
+        .nav-links a.active {
+            color: var(--text);
+            text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+        }
+
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .nav-links .btn-auth {
+            padding: 10px 24px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .nav-links .btn-auth:hover,
+        .nav-links .active-btn {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        #user-info {
+            display: none;
+            gap: 15px;
+            align-items: center;
+        }
+
+        #user-name {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .logout-btn {
+            cursor: pointer;
+            color: #ef4444 !important;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">AUDIO SENSE</a>
+        <div class="nav-links">
+            @if (ViewData["HideNav"] == null)
+            {
+                <a href="/">Home</a>
+            }
+            <div id="auth-links">
+                <a href="/Account/Login" class="@(ViewData["Title"]?.ToString() == "Log In" ? "active" : "")">Login</a>
+                <a href="/Account/Signup" class="btn-auth @(ViewData["Title"]?.ToString() == "Sign Up" ? "active-btn" : "")">Sign Up</a>
+            </div>
+            <div id="user-info">
+                <span>Welcome, <span id="user-name"></span></span>
+                <a onclick="logout()" class="logout-btn">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        @RenderBody()
+    </div>
+
+    <script>
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const username = localStorage.getItem('username');
+            const authLinks = document.getElementById('auth-links');
+            const userInfo = document.getElementById('user-info');
+            const userNameSpan = document.getElementById('user-name');
+
+            if (token && username) {
+                authLinks.style.display = 'none';
+                userInfo.style.display = 'flex';
+                userNameSpan.textContent = username;
+            } else {
+                authLinks.style.display = 'flex';
+                userInfo.style.display = 'none';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            window.location.href = '/';
+        }
+
+        checkAuth();
+    </script>
+</body>
+</html>
